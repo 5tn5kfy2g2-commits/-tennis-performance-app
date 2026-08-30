@@ -1,0 +1,237 @@
+Tennis_Performance_App.html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tennis Performance App</title>
+
+<style>
+body{
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+    background:#f5f5f5;
+    color:#111;
+    margin:0;
+    padding:0;
+}
+
+header{
+    padding:20px;
+    background:#111;
+    color:#fff;
+}
+
+button{
+    background:#FF8400;
+    color:#fff;
+    border:none;
+    padding:14px 18px;
+    border-radius:12px;
+    font-weight:700;
+    width:100%;
+}
+
+.card{
+    background:#fff;
+    margin:12px;
+    padding:16px;
+    border-radius:16px;
+}
+
+.done{
+    background:#e8f7ea;
+}
+
+.nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#fff;
+    display:flex;
+    justify-content:space-around;
+    padding:10px;
+    border-top:1px solid #ddd;
+}
+
+main{
+    padding-bottom:80px;
+}
+
+.small{
+    color:#575A5D;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>12-WEEK TENNIS PERFORMANCE</div>
+    <h2 id="today"></h2>
+    <div id="week"></div>
+</header>
+
+<main>
+
+    <div class="card">
+        <button onclick="showWorkout()">
+            START WORKOUT
+        </button>
+    </div>
+
+    <div id="content"></div>
+
+</main>
+
+<div class="nav">
+    <div>HOME</div>
+    <div>WEEK</div>
+    <div>WORKOUT</div>
+    <div>ROADMAP</div>
+    <div>MORE</div>
+</div>
+
+<script>
+
+const workouts = {
+
+    Monday:{
+        title:'Upper A',
+        warmup:'5 min Assault Bike + band pull-aparts x15 + scap push-ups x10',
+        ex:[
+            ['Bench Press','3x6-8','RPE7-8','2-3 min'],
+            ['Pull-up','3x6-10','RPE7-8','2 min'],
+            ['Incline DB Press','3x8-10','RPE8','90 sec']
+        ]
+    },
+
+    Tuesday:{
+        title:'Lower A',
+        warmup:'5 min bike + squat x10',
+        ex:[
+            ['Trap Bar Deadlift','3x4-6','RPE7-8','2-3 min'],
+            ['Bulgarian Split Squat','3x6-8/side','RPE7-8','2 min']
+        ]
+    },
+
+    Wednesday:{
+        title:'Upper B',
+        warmup:'5 min bike',
+        ex:[
+            ['DB Shoulder Press','3x6-8','RPE7-8','2 min']
+        ]
+    },
+
+    Thursday:{
+        title:'Lower B',
+        warmup:'5 min bike',
+        ex:[
+            ['Front Squat/Hack Squat','3x5-8','RPE7-8','2-3 min']
+        ]
+    },
+
+    Friday:{
+        title:'Athletic Robustness',
+        warmup:'3-5 min bike',
+        ex:[
+            ['Split Squat Iso','2x30s','RPE6-7','45 sec']
+        ]
+    }
+
+};
+
+const day =
+    new Date().toLocaleDateString(
+        'en-US',
+        {weekday:'long'}
+    );
+
+document.getElementById('today').innerText = day;
+
+function getWeek(){
+
+    let s = localStorage.startDate;
+
+    if(!s){
+        return 1;
+    }
+
+    let d =
+        (Date.now() - new Date(s))
+        / 86400000;
+
+    return Math.min(
+        12,
+        Math.max(
+            1,
+            Math.floor(d/7)+1
+        )
+    );
+}
+
+document.getElementById('week').innerText =
+    'Week ' + getWeek() + ' of 12';
+
+function showWorkout(){
+
+    let w =
+        workouts[day] ||
+        {
+            title:'Recovery Day',
+            warmup:'',
+            ex:[]
+        };
+
+    let h =
+        '<div class="card">' +
+        '<h3>' + w.title + '</h3>' +
+        '<p>' + w.warmup + '</p>' +
+        '</div>';
+
+    w.ex.forEach((e,i)=>{
+
+        let id = 'ex' + i;
+
+        let c =
+            localStorage[id]=='1'
+            ? 'done'
+            : '';
+
+        h +=
+            '<div class="card '+c+'">' +
+            '<b>'+(i+1)+'. '+e[0]+'</b><br>' +
+            e[1] + '<br>' +
+            e[2] + '<br>' +
+            'Rest ' + e[3] + '<br><br>' +
+            '<button onclick="complete(\''+
+            id+
+            '\',this)">✓ COMPLETE</button>' +
+            '</div>';
+
+    });
+
+    document.getElementById('content').innerHTML = h;
+}
+
+function complete(id,b){
+
+    localStorage[id]='1';
+
+    b.parentElement.classList.add('done');
+
+}
+
+if(!localStorage.startDate){
+
+    localStorage.startDate =
+        new Date()
+        .toISOString()
+        .slice(0,10);
+
+}
+
+</script>
+
+</body>
+</html>
